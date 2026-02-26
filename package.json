@@ -1,0 +1,10 @@
+{
+  "name": "oauth-exercise",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix resource_server\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}

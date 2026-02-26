@@ -1,0 +1,20 @@
+{
+  "name": "resource-server",
+  "version": "1.0.0",
+  "description": "OAuth2 resource server example",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "express": "^5.2.1",
+    "express-handlebars": "^8.0.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

@@ -1,0 +1,20 @@
+CALLBACK COMPLETE
+{{#if error}}
+Error: {{error}}
+{{/if}}
+{{#if errorJson}}
+<pre>{{errorJson}}</pre>
+{{/if}}
+{{#if sessionId}}
+Session: {{sessionId}}
+{{/if}}
+{{#if sessionJson}}
+<pre>{{sessionJson}}</pre>
+{{/if}}
+
+<button id="go-home">go to home</button>
+<script>
+  document.getElementById('go-home').addEventListener('click', () => {
+    window.location.href = '/';
+  });
+</script>
