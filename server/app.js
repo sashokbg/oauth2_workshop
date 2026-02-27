@@ -46,6 +46,7 @@ function redirectToAgendaAuth(res) {
   authUrl.searchParams.set('response_type', 'code');
   authUrl.searchParams.set('scope', 'agenda.read');
   authUrl.searchParams.set('redirect_uri', AGENDA_REDIRECT_URI);
+  authUrl.searchParams.set('prompt', 'consent');
   return res.redirect(authUrl.toString());
 }
 
@@ -172,7 +173,7 @@ app.get('/logout', async (req, res) => {
 
 app.get('/logout-resource', async (req, res) => {
   const logoutUrl = new URL(
-    `${KEYCLOAK_RESOURCE_BASE_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/logout`
+    `${KEYCLOAK_RESOURCE_BASE_URL}/realms/${KEYCLOAK_RESOURCE_REALM}/protocol/openid-connect/logout`
   );
   logoutUrl.searchParams.set('post_logout_redirect_uri', POST_LOGOUT_REDIRECT_URI);
   logoutUrl.searchParams.set('client_id', KEYCLOAK_RESOURCE_CLIENT_ID);

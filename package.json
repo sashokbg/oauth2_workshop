@@ -1,6 +1,10 @@
 {
   "name": "oauth-exercise",
   "version": "1.0.0",
+  "workspaces": [
+    "server",
+    "resource_server"
+  ],
   "scripts": {
     "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix resource_server\""
   },
