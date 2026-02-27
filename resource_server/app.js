@@ -5,8 +5,8 @@ const { engine } = require('express-handlebars');
 const app = express();
 const port = 3001;
 
-const KEYCLOAK_BASE_URL = process.env.KEYCLOAK_BASE_URL || 'http://localhost:8080';
-const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'app_realm';
+const KEYCLOAK_BASE_URL = process.env.KEYCLOAK_BASE_URL;
+const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM;
 const KEYCLOAK_CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID;
 const KEYCLOAK_CLIENT_SECRET = process.env.KEYCLOAK_CLIENT_SECRET || '';
 

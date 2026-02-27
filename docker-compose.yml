@@ -12,5 +12,6 @@ services:
       KC_HTTP_ENABLED: "true"
     volumes:
       - kc_data:/opt/keycloak/data
+      - ./themes:/opt/keycloak/themes
 volumes:
   kc_data:

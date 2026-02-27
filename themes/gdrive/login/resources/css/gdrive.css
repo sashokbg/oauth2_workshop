@@ -1,0 +1,165 @@
+/* Google Drive-inspired theme for Keycloak login/consent pages */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
+
+/* ── Base ─────────────────────────────────────────────────── */
+html,
+body,
+.login-pf,
+.login-pf-page {
+  background-color: #fff !important;
+  background-image: none !important;
+  font-family: 'Roboto', arial, sans-serif;
+}
+
+/* ── Header / realm display name ─────────────────────────── */
+#kc-header {
+  background: transparent;
+  text-align: center;
+  padding: 36px 0 0 0;
+}
+
+#kc-header-wrapper {
+  background: transparent;
+  font-family: 'Roboto', arial, sans-serif;
+  font-size: 22px;
+  font-weight: 300;
+  color: #202124;
+  padding: 8px 0;
+  text-shadow: none;
+}
+
+/* Coloured Drive triangle ▲ before the realm name */
+#kc-header-wrapper::before {
+  content: "▲  ";
+  background: linear-gradient(
+    to bottom right,
+    #4285f4 0%   50%,
+    #34a853 50%  75%,
+    #fbbc05 75% 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 20px;
+}
+
+/* ── Login card ───────────────────────────────────────────── */
+.card-pf {
+  background: #fff;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+  max-width: 450px;
+  margin: 20px auto;
+  padding: 40px 48px 48px;
+}
+
+/* ── Page title ("Sign In", "Grant Access", …) ────────────── */
+#kc-page-title {
+  font-family: 'Roboto', arial, sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: #202124;
+  text-align: center;
+}
+
+/* ── Form inputs ──────────────────────────────────────────── */
+.form-control {
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  color: #202124;
+  font-family: 'Roboto', arial, sans-serif;
+  font-size: 16px;
+  padding: 12px 15px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-control:focus {
+  border-color: #1a73e8;
+  box-shadow: inset 0 0 0 1px #1a73e8;
+  outline: none;
+}
+
+/* ── Labels ───────────────────────────────────────────────── */
+label,
+.login-pf label {
+  font-family: 'Roboto', arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #5f6368;
+}
+
+/* ── Primary button (Google blue) ────────────────────────── */
+.btn-primary,
+.btn-primary:active,
+.btn-primary.active {
+  background-color: #1a73e8 !important;
+  border-color: #1a73e8 !important;
+  border-radius: 4px;
+  font-family: 'Roboto', arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  padding: 8px 24px;
+  text-transform: none;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #1557b0 !important;
+  border-color: #1557b0 !important;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3),
+              0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
+/* ── Secondary / cancel button ───────────────────────────── */
+.btn-default {
+  border-color: #dadce0;
+  color: #1a73e8;
+  background: #fff;
+  font-family: 'Roboto', arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+.btn-default:hover {
+  background: #f8f9fa;
+  border-color: #c6c6c6;
+  color: #1557b0;
+}
+
+/* ── Links ────────────────────────────────────────────────── */
+a {
+  color: #1a73e8;
+}
+
+a:hover {
+  color: #1557b0;
+  text-decoration: underline;
+}
+
+/* ── OAuth / consent scope list ──────────────────────────── */
+#kc-oauth h3 {
+  font-family: 'Roboto', arial, sans-serif;
+  color: #202124;
+  font-weight: 400;
+}
+
+.scope-name {
+  font-weight: 500;
+  color: #202124;
+}
+
+/* ── Alerts / errors ─────────────────────────────────────── */
+.alert-error {
+  border-left: 4px solid #ea4335;
+}
+
+.alert-warning {
+  border-left: 4px solid #fbbc05;
+}
+
+.alert-success {
+  border-left: 4px solid #34a853;
+}
