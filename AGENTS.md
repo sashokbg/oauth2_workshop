@@ -22,6 +22,8 @@ The app server is found under `server`
 The authentication flow used is "code flow", so the JWT tokens are stored in the backend and an HTTPOnly session cookie is sent to the client (browser).
 The session store on the backend is a very simple JSON file containing the sessionid and a JSON document with the various tokens.
 
+## OAuth2
+
 ```mermaid
 sequenceDiagram
     participant Resource_Owner
@@ -47,4 +49,30 @@ sequenceDiagram
     Auth_Server -->> Resource_Server: OK
     Resource_Server -->> Client_App: <resource payload>
     Client_App -->> Resource_Owner: <resource payload>
+```
+
+## OIDC
+
+```mermaid
+sequenceDiagram
+    participant Resource_Owner
+    participant Client/Resource App
+    participant Auth_Server
+
+
+    Resource_Owner->> Client/Resource App: Request resource
+    Client/Resource App -->> Client/Resource App: Verify session
+    Client/Resource App ->> Resource_Owner: Redirect to Auth
+    Resource_Owner ->> Auth_Server: Authorize and Consent
+    Auth_Server -->> Resource_Owner: One time use Code
+    Resource_Owner ->> Client/Resource App: Callback URL + <code>
+    Client/Resource App ->> Auth_Server: Exchange code for tokens
+    Auth_Server -->> Client/Resource App: ID Tokens JWT
+    Client/Resource App ->> Client/Resource App: Create session & Store Tokens
+    Client/Resource App -->> Resource_Owner: Session Cookie
+    Resource_Owner ->> Client/Resource App: /resource + <session>
+    Client/Resource App ->> Client/Resource App: Verify Sesssion & Token
+    Client/Resource App ->> Auth_Server: Introspect token
+    Auth_Server -->> Client/Resource App: OK
+    Client/Resource App -->> Resource_Owner: <resource payload>
 ```
