@@ -1,4 +1,6 @@
 const dotenv = require('dotenv');
+dotenv.config({path: `${__dirname}/.env`});
+
 const crypto = require("crypto");
 const express = require("express");
 const axios = require("axios");
@@ -13,8 +15,6 @@ const {
   AGENDA_REDIRECT_URI, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET, REDIRECT_URI, KEYCLOAK_RESOURCE_BASE_URL,
   RESOURCE_SERVER_URL, POST_LOGOUT_REDIRECT_URI, KEYCLOAK_RESOURCE_REALM
 } = require("./config");
-
-dotenv.config({path: `${__dirname}/.env`});
 
 const app = express()
 const port = 3000
