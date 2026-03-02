@@ -2,13 +2,22 @@ version: 3
 tasks:
   start_keycloak:
     desc: "Start the docker compose Keycloak instance"
+    dir: authorization
     cmds:
-      - echo "not yet implemented"
+      - docker compose up --wait -d
+
+  destroy_infra:
+    desc: "Destroy infra"
+    dir: authorization
+    cmds:
+      - docker compose down --remove-orphans --volumes
 
   update_infra:
     desc: "Run tofu to update the Keycloak config"
+    dir: authorization/infra
     cmds:
-      - echo "Not yet implemented"
+      - tofu init
+      - tofu apply -auto-approve
 
   retag_commits:
     desc: "Redo the commit tags"
@@ -30,6 +39,8 @@ tasks:
   run:
     desc: "Start the expressjs servers"
     cmds:
+      - task: start_keycloak
+      - task: update_infra
       - npm i
       - npm run dev
 

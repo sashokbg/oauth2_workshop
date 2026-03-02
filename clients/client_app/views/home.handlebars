@@ -9,6 +9,14 @@
         <strong>Unknown</strong>
       {{/if}}
     </span>
+    <div class="status-item">
+      Agenda Token
+      {{#if hasAgendaToken}}
+        <span class="badge ok">Active</span>
+      {{else}}
+        <span class="badge off">Missing</span>
+      {{/if}}
+    </div>
   </div>
 </div>
 

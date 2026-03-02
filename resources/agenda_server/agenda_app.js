@@ -1,4 +1,6 @@
 const express = require('express');
+const {tokenVerifier} = require("@oauth-exercise/lib");
+
 const agenda_app = express();
 const port = 3001;
 
@@ -10,7 +12,9 @@ const AGENDA_ITEMS = [
   {time: '16:00', title: 'Code review'},
 ];
 
-agenda_app.get('/agenda', (req, res) => {
+const tokenVerifyMiddleware = tokenVerifier();
+
+agenda_app.get('/agenda', tokenVerifyMiddleware, (req, res) => {
   console.log("GETTING AGENDA");
 
   res.json({items: AGENDA_ITEMS});
