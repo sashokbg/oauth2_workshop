@@ -104,6 +104,30 @@ client_app.get('/callback-agenda', async (req, res) => {
   }
 });
 
+
+client_app.get('/logout-agenda', async (req, res) => {
+  const sessionCookie = req.cookies?.SESSION;
+
+  if (sessionCookie) {
+    const store = await readSessionStore();
+    const session = store.sessions[sessionCookie];
+    if (session) {
+      delete store.sessions[sessionCookie].agendaTokens;
+      await writeSessionStore(store);
+    }
+
+    res.clearCookie('SESSION');
+  }
+
+  const logoutUrl = new URL(
+    `${conf.agenda.KEYCLOAK_BASE_URL}/realms/${conf.agenda.KEYCLOAK_REALM}/protocol/openid-connect/logout`
+  );
+  logoutUrl.searchParams.set('post_logout_redirect_uri', conf.agenda.POST_LOGOUT_REDIRECT_URI);
+  logoutUrl.searchParams.set('client_id', conf.agenda.KEYCLOAK_CLIENT_ID);
+
+  return res.redirect(logoutUrl.toString());
+});
+
 client_app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
