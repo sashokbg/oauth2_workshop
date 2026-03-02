@@ -1,6 +1,5 @@
 const path = require("node:path");
 const fs = require('fs/promises');
-const crypto = require("crypto");
 const SESSION_STORE_PATH = path.join(__dirname, 'sessions.json');
 
 async function readSessionStore() {

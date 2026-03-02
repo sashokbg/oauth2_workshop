@@ -13,6 +13,7 @@ const AGENDA_ITEMS = [
   {time: '16:00', title: 'Code review'},
 ];
 
+
 const tokenVerifyMiddleware = tokenVerifier(
   `${conf.agenda.KEYCLOAK_BASE_URL}/realms/${conf.agenda.KEYCLOAK_REALM}/protocol/openid-connect/certs`,
   'agenda.read'
