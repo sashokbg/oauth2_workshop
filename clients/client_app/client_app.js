@@ -1,9 +1,11 @@
+const crypto = require("crypto");
 const express = require("express");
 const axios = require("axios");
 const cookieParser = require("cookie-parser");
 const {engine} = require("express-handlebars");
-const conf = require("@oauth-exercise/lib/config");
+const {readSessionStore, writeSessionStore} = require("./session.js");
 const {exchange_code_for_token} = require("./token");
+const conf = require("@oauth-exercise/lib/config");
 
 const client_app = express()
 const port = 3000
@@ -13,13 +15,35 @@ client_app.set('view engine', 'handlebars');
 client_app.set('views', './views');
 client_app.use(cookieParser());
 
-let token = '';
+client_app.use(async (req, res, next) => {
+  let sessionCookie = req.cookies?.SESSION;
+  const store = await readSessionStore();
+
+  if (!sessionCookie || !store.sessions[sessionCookie]) {
+    const sessionId = crypto.randomUUID();
+    sessionCookie = sessionId;
+    store.sessions[sessionId] = {
+      createdAt: new Date().toISOString(),
+    };
+    await writeSessionStore(store);
+
+    res.cookie('SESSION', sessionId, {
+      httpOnly: true,
+      sameSite: 'lax',
+    });
+  }
+
+  req.sessionId = sessionCookie;
+  req.session = store.sessions[sessionCookie];
+  req.sessionStore = store;
+  next();
+})
 
 client_app.get('/', async (req, res) => {
-  const username = "anonymous"
-  const hasAgendaToken = Boolean(token);
+  const {session} = req;
+  const hasAgendaToken = Boolean(session?.agenda?.access_token);
 
-  res.render('home', {username, hasAgendaToken})
+  res.render('home', {username: "unknown", hasAgendaToken})
 })
 
 function redirectToAgendaAuth(res) {
@@ -33,14 +57,22 @@ function redirectToAgendaAuth(res) {
   return res.redirect(authUrl.toString());
 }
 
-client_app.get('/agenda', async (req, res) => {
+client_app.get('/agenda',  async (req, res) => {
+  const {session, sessionStore} = req;
+  const accessToken = session['agenda']?.access_token;
+  if (!accessToken) {
+    return redirectToAgendaAuth(res);
+  }
+
   try {
     const response = await axios.get(`${conf.agenda.APP_URL}/agenda`, {
-      headers: {Authorization: `Bearer ${token}`},
+      headers: {Authorization: `Bearer ${accessToken}`},
     });
     res.render('agenda', {items: response.data.items});
   } catch (err) {
     if (err.response?.status === 401) {
+      delete session.agenda;
+      await writeSessionStore(sessionStore);
       return redirectToAgendaAuth(res);
     }
     const error = err.response?.data?.error || err.message;
@@ -50,6 +82,7 @@ client_app.get('/agenda', async (req, res) => {
 
 client_app.get('/callback-agenda', async (req, res) => {
   const {code} = req.query;
+  const {session, sessionStore} = req;
 
   try {
     const tokenResponse = await exchange_code_for_token(
@@ -60,10 +93,10 @@ client_app.get('/callback-agenda', async (req, res) => {
       conf.agenda.KEYCLOAK_CLIENT_SECRET,
       conf.agenda.KEYCLOAK_REDIRECT_URI
     );
+    session['agenda'] = tokenResponse.data;
+    await writeSessionStore(sessionStore);
 
-    token = tokenResponse.data.access_token;
-
-    return res.redirect('/agenda');
+    return res.redirect(conf.agenda.POST_AUTH_REDIRECT);
   } catch (err) {
     console.error('AGENDA TOKEN EXCHANGE ERROR', err.response?.data || err.message);
     const error = err.response?.data || err.message;
