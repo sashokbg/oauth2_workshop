@@ -1,5 +1,6 @@
 const express = require('express');
 const {tokenVerifier} = require("@oauth-exercise/lib");
+const conf = require("@oauth-exercise/lib/config");
 
 const agenda_app = express();
 const port = 3001;
@@ -12,7 +13,10 @@ const AGENDA_ITEMS = [
   {time: '16:00', title: 'Code review'},
 ];
 
-const tokenVerifyMiddleware = tokenVerifier();
+const tokenVerifyMiddleware = tokenVerifier(
+  `${conf.agenda.KEYCLOAK_BASE_URL}/realms/${conf.agenda.KEYCLOAK_REALM}/protocol/openid-connect/certs`,
+  'agenda.read'
+);
 
 agenda_app.get('/agenda', tokenVerifyMiddleware, (req, res) => {
   console.log("GETTING AGENDA");

@@ -19,6 +19,7 @@ resource "keycloak_openid_client" "agenda_client" {
 
   standard_flow_enabled     = true
   client_secret             = "s0me_secret_cl1ent"
+  consent_required          = true
 }
 
 resource "keycloak_user" "resource_user" {
@@ -31,4 +32,23 @@ resource "keycloak_user" "resource_user" {
   initial_password {
     value = "resource_user"
   }
+}
+
+resource "keycloak_openid_client_scope" "agenda_scope" {
+  name                   = "agenda.read"
+  realm_id               = keycloak_realm.resource_realm.id
+  consent_screen_text    = "Do you allow the app to read your agenda ? (agenda.read)"
+  include_in_token_scope = true
+}
+
+resource "keycloak_openid_client_optional_scopes" "app_scope" {
+  client_id      = keycloak_openid_client.agenda_client.id
+  realm_id       = keycloak_realm.resource_realm.id
+  optional_scopes = [keycloak_openid_client_scope.agenda_scope.name]
+}
+
+resource "keycloak_openid_client_default_scopes" "app_default_scope" {
+  client_id      = keycloak_openid_client.agenda_client.id
+  realm_id       = keycloak_realm.resource_realm.id
+  default_scopes = []
 }

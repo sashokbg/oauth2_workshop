@@ -52,6 +52,7 @@ function redirectToAgendaAuth(res) {
   );
   authUrl.searchParams.set('client_id', conf.agenda.KEYCLOAK_CLIENT_ID);
   authUrl.searchParams.set('response_type', 'code');
+  authUrl.searchParams.set('scope', 'agenda.read');
   authUrl.searchParams.set('redirect_uri', conf.agenda.KEYCLOAK_REDIRECT_URI);
   authUrl.searchParams.set('prompt', 'consent');
   return res.redirect(authUrl.toString());

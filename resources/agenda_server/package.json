@@ -1,5 +1,5 @@
 {
-  "name": "resource-server",
+  "name": "@oauth-exercise/agenda_server",
   "version": "1.0.0",
   "description": "OAuth2 resource server example",
   "main": "agenda_app.js",
