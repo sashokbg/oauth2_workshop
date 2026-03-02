@@ -1,5 +1,5 @@
 const express = require('express');
-const {tokenVerifier} = require("@oauth-exercise/lib");
+const {tokenVerifier, tokenIntrospector} = require("@oauth-exercise/lib");
 const conf = require("@oauth-exercise/lib/config");
 
 const agenda_app = express();
@@ -18,7 +18,14 @@ const tokenVerifyMiddleware = tokenVerifier(
   'agenda.read'
 );
 
-agenda_app.get('/agenda', tokenVerifyMiddleware, (req, res) => {
+const tokenIntrospectMiddleware = tokenIntrospector(
+  conf.agenda.KEYCLOAK_BASE_URL,
+  conf.agenda.KEYCLOAK_REALM,
+  conf.agenda.KEYCLOAK_CLIENT_ID,
+  conf.agenda.KEYCLOAK_CLIENT_SECRET
+)
+
+agenda_app.get('/agenda', tokenVerifyMiddleware, tokenIntrospectMiddleware, (req, res) => {
   console.log("GETTING AGENDA");
 
   res.json({items: AGENDA_ITEMS});
