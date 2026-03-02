@@ -54,10 +54,11 @@ client_app.use(async (req, res, next) => {
 client_app.get('/', async (req, res) => {
   const {session} = req;
   const hasAgendaToken = Boolean(session?.agenda?.access_token);
+  const hasContactsToken = Boolean(session?.contacts?.access_token);
 
   const username = session?.decodedTokens?.id_token?.preferred_username
 
-  res.render('home', {username, hasAgendaToken})
+  res.render('home', {username, hasAgendaToken, hasContactsToken})
 })
 
 function redirectToAuth(res, app) {
@@ -94,6 +95,29 @@ client_app.get('/agenda', async (req, res) => {
     }
     const error = err.response?.data?.error || err.message;
     res.render('agenda', {error});
+  }
+})
+
+client_app.get('/contacts', async (req, res) => {
+  const {session, sessionStore} = req;
+  const accessToken = session.contacts?.access_token;
+  if (!accessToken) {
+    return redirectToAuth(res, 'contacts');
+  }
+
+  try {
+    const response = await axios.get(`${conf.contacts.APP_URL}/contacts`, {
+      headers: {Authorization: `Bearer ${accessToken}`},
+    });
+    res.render('contacts', {items: response.data.items});
+  } catch (err) {
+    if (err.response?.status === 401) {
+      delete session.contacts;
+      await writeSessionStore(sessionStore);
+      return redirectToAuth(res, 'contacts')
+    }
+    const error = err.response?.data?.error || err.message;
+    res.render('contacts', {error});
   }
 })
 
@@ -214,12 +238,21 @@ client_app.get('/callback-agenda', async (req, res) => {
   await handleResourceCallback(code, req, res, 'agenda');
 });
 
+client_app.get('/callback-contacts', async (req, res) => {
+  const {code} = req.query;
+  await handleResourceCallback(code, req, res, 'contacts');
+});
+
 client_app.get('/logout', async (req, res) => {
   return await logout(req, res, 'client');
 });
 
 client_app.get('/logout-agenda', async (req, res) => {
   return await logout(req, res, 'agenda');
+});
+
+client_app.get('/logout-contacts', async (req, res) => {
+  return await logout(req, res, 'contacts');
 });
 
 client_app.listen(port, () => {

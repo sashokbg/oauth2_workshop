@@ -41,6 +41,13 @@ resource "keycloak_openid_client_scope" "agenda_scope" {
   include_in_token_scope = true
 }
 
+resource "keycloak_openid_audience_protocol_mapper" "agenda_audience" {
+  realm_id                 = keycloak_realm.resource_realm.id
+  client_id                = keycloak_openid_client.agenda_client.id
+  name                     = "agenda-audience"
+  included_custom_audience = "agenda-app-audience"
+}
+
 resource "keycloak_openid_client_optional_scopes" "app_scope" {
   client_id      = keycloak_openid_client.agenda_client.id
   realm_id       = keycloak_realm.resource_realm.id
@@ -51,4 +58,40 @@ resource "keycloak_openid_client_default_scopes" "app_default_scope" {
   client_id      = keycloak_openid_client.agenda_client.id
   realm_id       = keycloak_realm.resource_realm.id
   default_scopes = []
+}
+
+# # # # # # # # # # # # #
+# CONTACTS CONFIG
+# # # # # # # # # # # # #
+
+resource "keycloak_openid_client" "contacts_client" {
+  access_type = "CONFIDENTIAL"
+  client_id   = "contacts-app"
+  realm_id    = keycloak_realm.resource_realm.id
+
+  valid_post_logout_redirect_uris = ["http://client-app:3000"]
+  valid_redirect_uris             = ["http://client-app:3000/callback-contacts"]
+
+  standard_flow_enabled = true
+  client_secret         = "s0me_secret_cl1ent"
+  consent_required      = true
+}
+
+resource "keycloak_openid_client_optional_scopes" "app_scope_contacts" {
+  client_id      = keycloak_openid_client.contacts_client.id
+  realm_id       = keycloak_realm.resource_realm.id
+  optional_scopes = [keycloak_openid_client_scope.agenda_scope.name]
+}
+
+resource "keycloak_openid_client_default_scopes" "app_default_scope_contacts" {
+  client_id      = keycloak_openid_client.contacts_client.id
+  realm_id       = keycloak_realm.resource_realm.id
+  default_scopes = []
+}
+
+resource "keycloak_openid_audience_protocol_mapper" "contacts_audience" {
+  realm_id                 = keycloak_realm.resource_realm.id
+  client_id                = keycloak_openid_client.contacts_client.id
+  name                     = "contacts-audience"
+  included_custom_audience = "contacts-app-audience"
 }

@@ -17,15 +17,25 @@
         <span class="badge off">Missing</span>
       {{/if}}
     </div>
+    <div class="status-item">
+      Contacts Token
+      {{#if hasContactsToken}}
+        <span class="badge ok">Active</span>
+      {{else}}
+        <span class="badge off">Missing</span>
+      {{/if}}
+    </div>
   </div>
 </div>
 
 <div class="button-grid">
   <a class="btn" href="/agenda">Agenda</a>
+  <a class="btn" href="/contacts">Contacts</a>
 </div>
 
 <h3 class="section-title" style="margin-top: 22px;">Session Controls</h3>
 <div class="button-grid">
   <a class="btn secondary" href="/logout">Logout</a>
   <a class="btn secondary" href="/logout-agenda">Logout Agenda</a>
+  <a class="btn secondary" href="/logout-contacts">Logout Agenda</a>
 </div>

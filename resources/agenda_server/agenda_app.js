@@ -29,6 +29,11 @@ const tokenIntrospectMiddleware = tokenIntrospector(
 agenda_app.get('/agenda', tokenVerifyMiddleware, tokenIntrospectMiddleware, (req, res) => {
   console.log("GETTING AGENDA");
 
+  const scopes = (req.tokenInfo.scope || '').split(' ');
+  if (!scopes.includes('agenda.read')) {
+    return res.status(403).json({error: 'Missing required scope: agenda.read'});
+  }
+
   res.json({items: AGENDA_ITEMS});
 });
 

@@ -1,0 +1,19 @@
+{
+  "name": "@oauth-exercise/contacts_server",
+  "version": "1.0.0",
+  "description": "OAuth2 resource server example",
+  "main": "contacts_app.js",
+  "scripts": {
+    "dev": "nodemon contacts_app.js",
+    "start": "node contacts_app.js"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "express": "^5.2.1",
+    "@oauth-exercise/lib": "*"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

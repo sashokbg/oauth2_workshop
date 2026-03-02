@@ -1,0 +1,20 @@
+<h1>Your Contacts</h1>
+
+{{#if error}}
+  <p>Error: {{error}}</p>
+{{else}}
+  <ul>
+    {{#each items}}
+      <li>
+        <strong>{{this.name}}</strong> — {{this.email}}
+        <ul>
+          {{#each this.agenda as |agenda_item|}}
+            <li><strong>{{agenda_item.time}}</strong> — {{agenda_item.title}}</li>
+          {{/each}}
+        </ul>
+      </li>
+    {{/each}}
+  </ul>
+{{/if}}
+
+<a href="/">Back to home</a>

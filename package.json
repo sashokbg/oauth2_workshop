@@ -4,10 +4,11 @@
   "workspaces": [
     "lib",
     "resources/agenda_server",
+    "resources/contacts_server",
     "clients/client_app"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --prefix clients/client_app\" \"npm run dev --prefix resources/agenda_server\""
+    "dev": "concurrently \"npm run dev --prefix clients/client_app\" \"npm run dev --prefix resources/agenda_server\" \"npm run dev --prefix resources/contacts_server\""
   },
   "devDependencies": {
     "concurrently": "^9.0.0"
