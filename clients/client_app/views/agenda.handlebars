@@ -1,0 +1,13 @@
+<h2 class="section-title">Your Agenda</h2>
+
+{{#if error}}
+<p>Error: {{error}}</p>
+{{else}}
+<ul>
+  {{#each items}}
+  <li><strong>{{this.time}}</strong> — {{this.title}}</li>
+  {{/each}}
+</ul>
+{{/if}}
+
+<a class="btn secondary" href="/">Back to home</a>

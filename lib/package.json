@@ -1,0 +1,13 @@
+{
+  "name": "@oauth-exercise/lib",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "main": "index.js",
+  "dependencies": {
+    "jsonwebtoken": "^9.0.0",
+    "jwks-rsa": "^3.0.0"
+  },
+  "peerDependencies": {
+    "axios": "^1.13.6"
+  }
+}

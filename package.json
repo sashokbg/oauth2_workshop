@@ -1,0 +1,15 @@
+{
+  "name": "oauth-exercise",
+  "version": "1.0.0",
+  "workspaces": [
+    "lib",
+    "resources/agenda_server",
+    "clients/client_app"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix clients/client_app\" \"npm run dev --prefix resources/agenda_server\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}

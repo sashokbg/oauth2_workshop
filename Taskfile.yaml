@@ -1,0 +1,35 @@
+version: 3
+tasks:
+  start_keycloak:
+    desc: "Start the docker compose Keycloak instance"
+    cmds:
+      - echo "not yet implemented"
+
+  update_infra:
+    desc: "Run tofu to update the Keycloak config"
+    cmds:
+      - echo "Not yet implemented"
+
+  retag_commits:
+    desc: "Redo the commit tags"
+    cmds:
+      - git checkout $(git log main --oneline | grep -i 'stage 01' | cut -d' ' -f 1); git tag -f 01_init
+      - git checkout $(git log main --oneline | grep -i 'stage 02' | cut -d' ' -f 1); git tag -f 02_token
+      - git checkout $(git log main --oneline | grep -i 'stage 03' | cut -d' ' -f 1); git tag -f 03_session
+      - git checkout $(git log main --oneline | grep -i 'stage 04' | cut -d' ' -f 1); git tag -f 04_logout
+      - git checkout $(git log main --oneline | grep -i 'stage 05' | cut -d' ' -f 1); git tag -f 05_scope
+      - git checkout $(git log main --oneline | grep -i 'stage 06' | cut -d' ' -f 1); git tag -f 06_introspect
+      - git checkout $(git log main --oneline | grep -i 'stage 07' | cut -d' ' -f 1); git tag -f 07_oidc
+      - git checkout $(git log main --oneline | grep -i 'stage 08' | cut -d' ' -f 1); git tag -f 08_audience
+      - git checkout $(git log main --oneline | grep -i 'stage 09' | cut -d' ' -f 1); git tag -f 09_refresh
+      - git checkout $(git log main --oneline | grep -i 'stage 10' | cut -d' ' -f 1); git tag -f 10_pkce
+      - git checkout $(git log main --oneline | grep -i 'stage 11' | cut -d' ' -f 1); git tag -f 11_rbac
+      - git checkout $(git log main --oneline | grep -i 'stage 12' | cut -d' ' -f 1); git tag -f 12_service_acc
+      - git push origin $(git tag) -f
+
+  run:
+    desc: "Start the expressjs servers"
+    cmds:
+      - npm i
+      - npm run dev
+
