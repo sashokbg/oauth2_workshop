@@ -60,7 +60,7 @@ async function tokenRefresher(req, res, next) {
 }
 
 
-async function exchange_code_for_token(code, realm, base_url, client_id, client_secret, redirect_uri) {
+async function exchange_code_for_token(code, realm, base_url, client_id, client_secret, redirect_uri, code_verifier) {
   const tokenUrl = `${base_url}/realms/${realm}/protocol/openid-connect/token`;
   const body = new URLSearchParams({
     grant_type: 'authorization_code',
@@ -69,6 +69,10 @@ async function exchange_code_for_token(code, realm, base_url, client_id, client_
     redirect_uri: redirect_uri,
     code: code || '',
   });
+
+  if(code_verifier) {
+    body.set("code_verifier", code_verifier)
+  }
 
   return await axios.post(tokenUrl, body, {
     headers: {'Content-Type': 'application/x-www-form-urlencoded'},

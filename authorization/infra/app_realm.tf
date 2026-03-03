@@ -12,6 +12,7 @@ resource "keycloak_openid_client" "app" {
 
   standard_flow_enabled     = true
   client_secret             = "s0me_secret_cl1ent"
+  pkce_code_challenge_method = "S256"
 }
 
 resource "keycloak_user" "app_user" {
@@ -23,5 +24,17 @@ resource "keycloak_user" "app_user" {
   email          = "app_user@test.test"
   initial_password {
     value = "app_user"
+  }
+}
+
+resource "keycloak_user" "bad_user" {
+  realm_id       = keycloak_realm.app_realm.id
+  username       = "bad_user"
+  email_verified = true
+  first_name = "AAa"
+  last_name = "Bbb"
+  email          = "bad_user@test.test"
+  initial_password {
+    value = "bad_user"
   }
 }

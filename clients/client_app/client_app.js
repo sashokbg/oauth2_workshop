@@ -16,12 +16,11 @@ client_app.set('views', './views');
 client_app.use(cookieParser());
 
 client_app.use(async (req, res, next) => {
-  let sessionCookie = req.cookies?.SESSION;
+  let sessionId = req.cookies?.SESSION;
   const store = await readSessionStore();
 
-  let session = store.sessions[sessionCookie];
-  if (!sessionCookie || !session) {
-    const sessionId = crypto.randomUUID();
+  if (!sessionId || !store.sessions[sessionId]) {
+    sessionId = crypto.randomUUID();
     store.sessions[sessionId] = {
       createdAt: new Date().toISOString(),
     };
@@ -33,20 +32,32 @@ client_app.use(async (req, res, next) => {
     });
   }
 
-  if (!req.url.startsWith("/callback") && !session?.tokens?.id_token) {
+  if (!req.url.startsWith("/callback") && !store.sessions[sessionId]?.tokens?.id_token) {
     const authUrl = new URL(
       `${conf.client.KEYCLOAK_BASE_URL}/realms/${conf.client.KEYCLOAK_REALM}/protocol/openid-connect/auth`
     );
+    const pkce = crypto.randomBytes(32).toString('base64url');
+
+    const hashedSecret = crypto.createHash("sha256").update(pkce).digest('base64url');
+    const randomState = crypto.randomBytes(32).toString('base64url');
+
+    authUrl.searchParams.set('code_challenge', hashedSecret);
+    authUrl.searchParams.set('code_challenge_method', 'S256');
     authUrl.searchParams.set('client_id', conf.client.KEYCLOAK_CLIENT_ID);
     authUrl.searchParams.set('response_type', 'code');
     authUrl.searchParams.set('scope', 'openid');
     authUrl.searchParams.set('redirect_uri', conf.client.KEYCLOAK_REDIRECT_URI);
+    authUrl.searchParams.set('state', randomState);
+
+    store.sessions[sessionId].pkce = pkce;
+    store.sessions[sessionId].state = randomState;
+    await writeSessionStore(store);
 
     return res.redirect(authUrl.toString());
   }
 
-  req.sessionId = sessionCookie;
-  req.session = session;
+  req.sessionId = sessionId;
+  req.session = store.sessions[sessionId];
   req.sessionStore = store;
   next();
 })
@@ -127,8 +138,10 @@ async function handleResourceCallback(code, req, res, app) {
   }
 }
 
-async function handleCallback(code, sessionState, iss, res) {
+async function handleCallback(code, sessionState, iss, res, sessionId) {
   const c = conf.client;
+  const store = await readSessionStore();
+  let session = store.sessions[sessionId];
 
   try {
     const tokenResponse = await exchange_code_for_token(
@@ -137,11 +150,10 @@ async function handleCallback(code, sessionState, iss, res) {
       c.KEYCLOAK_BASE_URL,
       c.KEYCLOAK_CLIENT_ID,
       c.KEYCLOAK_CLIENT_SECRET,
-      c.KEYCLOAK_REDIRECT_URI
+      c.KEYCLOAK_REDIRECT_URI,
+      session.pkce
     );
 
-    const store = await readSessionStore();
-    const sessionId = crypto.randomUUID();
     const tokenData = tokenResponse.data;
 
     store.sessions[sessionId] = {
@@ -211,8 +223,15 @@ async function logout(req, res, app) {
 }
 
 client_app.get('/callback', async (req, res) => {
-  const {code, session_state: sessionState, iss} = req.query;
-  await handleCallback(code, sessionState, iss, res);
+  const {code, session_state: sessionState, iss, state} = req.query;
+  const {session} = req;
+
+  if(session.state !== state) {
+    console.error("Bad state");
+    res.status(403).send("Invalid state parameter")
+  }
+
+  await handleCallback(code, sessionState, iss, res, req.sessionId);
 });
 
 client_app.get('/callback-agenda', async (req, res) => {
