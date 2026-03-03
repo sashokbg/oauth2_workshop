@@ -20,6 +20,7 @@ resource "keycloak_openid_client" "agenda_client" {
   standard_flow_enabled     = true
   client_secret             = "s0me_secret_cl1ent"
   consent_required          = true
+  access_token_lifespan     = "10"
 }
 
 resource "keycloak_user" "resource_user" {

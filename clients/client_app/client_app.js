@@ -3,7 +3,7 @@ const express = require("express");
 const axios = require("axios");
 const cookieParser = require("cookie-parser");
 const {engine} = require("express-handlebars");
-const {exchange_code_for_token, decodeJwtPayload} = require("./token");
+const {exchange_code_for_token, decodeJwtPayload, refreshToken, tokenRefresher, redirectToAuth} = require("./token");
 const {readSessionStore, writeSessionStore} = require("./session.js");
 const conf = require("@oauth-exercise/lib/config");
 
@@ -33,7 +33,7 @@ client_app.use(async (req, res, next) => {
     });
   }
 
-  if(!req.url.startsWith("/callback") && !session?.tokens?.id_token) {
+  if (!req.url.startsWith("/callback") && !session?.tokens?.id_token) {
     const authUrl = new URL(
       `${conf.client.KEYCLOAK_BASE_URL}/realms/${conf.client.KEYCLOAK_REALM}/protocol/openid-connect/auth`
     );
@@ -61,34 +61,16 @@ client_app.get('/', async (req, res) => {
   res.render('home', {username, hasAgendaToken, hasContactsToken})
 })
 
-function redirectToAuth(res, app) {
-  let c = conf[app];
-
-  const authUrl = new URL(
-    `${c.KEYCLOAK_BASE_URL}/realms/${c.KEYCLOAK_REALM}/protocol/openid-connect/auth`
-  );
-  authUrl.searchParams.set('client_id', c.KEYCLOAK_CLIENT_ID);
-  authUrl.searchParams.set('response_type', 'code');
-  authUrl.searchParams.set('scope', 'agenda.read');
-  authUrl.searchParams.set('redirect_uri', c.KEYCLOAK_REDIRECT_URI);
-  authUrl.searchParams.set('prompt', 'consent');
-  return res.redirect(authUrl.toString());
-}
-
-client_app.get('/agenda', async (req, res) => {
+client_app.get('/agenda', tokenRefresher, async (req, res) => {
   const {session, sessionStore} = req;
-  const accessToken = session['agenda']?.access_token;
-  if (!accessToken) {
-    return redirectToAuth(res, 'agenda');
-  }
-
+  let accessToken = session['agenda']?.access_token;
   try {
     const response = await axios.get(`${conf.agenda.APP_URL}/agenda`, {
       headers: {Authorization: `Bearer ${accessToken}`},
     });
     res.render('agenda', {items: response.data.items});
   } catch (err) {
-    if (err.response?.status === 401) {
+    if (err.response?.status === 401 || err.response?.status === 400) {
       delete session.agenda;
       await writeSessionStore(sessionStore);
       return redirectToAuth(res, 'agenda');
