@@ -15,6 +15,12 @@ resource "keycloak_openid_client" "app" {
   pkce_code_challenge_method = "S256"
 }
 
+resource "keycloak_role" "backoffice_admin_role" {
+  name     = "backoffice_admin"
+  realm_id = keycloak_realm.app_realm.id
+  client_id = keycloak_openid_client.app.id
+}
+
 resource "keycloak_user" "app_user" {
   realm_id       = keycloak_realm.app_realm.id
   username       = "app_user"
@@ -37,4 +43,22 @@ resource "keycloak_user" "bad_user" {
   initial_password {
     value = "bad_user"
   }
+}
+
+resource "keycloak_user" "app_admin_user" {
+  realm_id       = keycloak_realm.app_realm.id
+  username       = "app_admin"
+  email_verified = true
+  first_name = "AAa"
+  last_name = "Bbb"
+  email          = "app_admin@test.test"
+  initial_password {
+    value = "app_admin"
+  }
+}
+
+resource "keycloak_user_roles" "user_role" {
+  realm_id = keycloak_realm.app_realm.id
+  role_ids = [keycloak_role.backoffice_admin_role.id]
+  user_id  = keycloak_user.app_admin_user.id
 }

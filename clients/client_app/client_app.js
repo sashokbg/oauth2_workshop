@@ -256,6 +256,15 @@ client_app.get('/logout-contacts', async (req, res) => {
   return await logout(req, res, 'contacts');
 });
 
+client_app.get('/backoffice', async (req, res) => {
+  if(!req.session.decodedTokens.access_token?.resource_access?.["client-app"]?.roles.includes("backoffice_admin")) {
+    res.status(403);
+    res.json("Requires role 'backoffice_admin'");
+  } else {
+    res.json("OK");
+  }
+})
+
 client_app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
