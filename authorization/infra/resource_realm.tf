@@ -61,6 +61,22 @@ resource "keycloak_openid_client_default_scopes" "app_default_scope" {
   default_scopes = []
 }
 
+resource "keycloak_openid_client" "another_server" {
+  access_type = "CONFIDENTIAL"
+  client_id   = "client-server"
+  realm_id    = keycloak_realm.resource_realm.id
+
+  standard_flow_enabled     = false
+  client_secret             = "anotherserversecret"
+  service_accounts_enabled  = true
+}
+
+resource "keycloak_openid_client_optional_scopes" "server_scopes" {
+  client_id = keycloak_openid_client.another_server.id
+  realm_id  = keycloak_realm.resource_realm.id
+  optional_scopes = [keycloak_openid_client_scope.agenda_scope.name]
+}
+
 # # # # # # # # # # # # #
 # CONTACTS CONFIG
 # # # # # # # # # # # # #

@@ -43,4 +43,3 @@ tasks:
       - task: update_infra
       - npm i
       - npm run dev
-

@@ -3,7 +3,7 @@ const express = require("express");
 const axios = require("axios");
 const cookieParser = require("cookie-parser");
 const {engine} = require("express-handlebars");
-const {exchange_code_for_token, decodeJwtPayload, refreshToken, tokenRefresher, redirectToAuth} = require("./token");
+const {exchange_code_for_token, decodeJwtPayload, getClientToken, tokenRefresher, redirectToAuth} = require("./token");
 const {readSessionStore, writeSessionStore} = require("./session.js");
 const conf = require("@oauth-exercise/lib/config");
 
@@ -257,11 +257,27 @@ client_app.get('/logout-contacts', async (req, res) => {
 });
 
 client_app.get('/backoffice', async (req, res) => {
-  if(!req.session.decodedTokens.access_token?.resource_access?.["client-app"]?.roles.includes("backoffice_admin")) {
+  if (!req.session.decodedTokens.access_token?.resource_access?.["client-app"]?.roles.includes("backoffice_admin")) {
     res.status(403);
     res.json("Requires role 'backoffice_admin'");
   } else {
     res.json("OK");
+  }
+})
+
+client_app.get('/server-to-server', async (req, res) => {
+  const c = conf.server_client;
+
+  let clientTokenResponse = await getClientToken(c.KEYCLOAK_BASE_URL, c.KEYCLOAK_REALM, c.KEYCLOAK_CLIENT_ID, c.KEYCLOAK_CLIENT_SECRET);
+
+  try {
+    const response = await axios.get(`${conf.agenda.APP_URL}/agenda`, {
+      headers: {Authorization: `Bearer ${clientTokenResponse.data.access_token}`},
+    });
+    res.render('agenda', {items: response.data.items});
+  } catch (err) {
+    const error = err.response?.data?.error || err.message;
+    res.render('agenda', {error});
   }
 })
 

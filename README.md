@@ -1,7 +1,23 @@
 # OAUTH Exercise
 
-This project shows how both OAUTH2 and Open ID Connect work in practice and what are the differences between the two.
+This project shows how both OAuth2 and Open ID Connect work in practice and what are the differences between the two.
 It is intended to be used as a Workshop / Playground for tinkering and debugging the interaction between the various actors in an OAuth2 scenarios.
+
+During this workshop you will learn the following concepts:
+- Oauth2 Actors (Authorization Server, Resource Server, Clint, Resource Owner)
+- Oauth2 Code Flow and Client Flow
+- Open ID Connect
+- Tokens, access and id tokens, token verification, JWT
+- Token verification & introspection
+- Proper and secure token storage
+- Refresh tokens
+- Session (HttpOnly) Cookies
+- Logout mechanisms
+- Scopes
+- Audience
+- Proof Key Code Exchange security & State
+- Role Based Access Control
+- Service Accounts / Client Credentials Grant
 
 ## Requirements
 
@@ -22,17 +38,19 @@ The following URLs should be properly resolved (check /etc/hosts)
 - http://agenda-app:3001/agenda
 - http://contacts-app:3002/contacts
 
-## Authorization Server
+## Setup
+
+### Authorization Server
 
 The `Authorization Server / Identity Provider` role is played by a Keycloak instance running in a docker container and configured using `tofu`. Keycloak config files are found under `./authorization/` directory.
 
-## Resource Server
+### Resource Server
 
 The `Resource Server` is an Expressjs API that returns a hard-coded list of agenda items and also performs token validation and introspection with Keycloak.
 
 The resource server is found under `resources/*`.
 
-## Client / App Server
+### Client / App Server
 
 The `Client` is a server that provides a very simple web application, using Expressjs and Handlebar templates.
 It exposes all the required pages and callback endpoints and manages the required redirects to the IdP (Keycloak).
@@ -40,16 +58,6 @@ It exposes all the required pages and callback endpoints and manages the require
 The /agenda endpoint will call the `agenda_server` with an access_token to show the user's agenda.
 
 The app server is found under `clients/client_app`
-
-## Session Management
-
-The authentication flow used is "code flow", so the JWT tokens are stored in the backend and an HTTPOnly session cookie is sent to the client (browser).
-
-The session store on the backend is a very simple JSON file containing the session id and a JSON document with the various tokens.
-
-## Client Scopes
-
-A custom `agenda.read` scope is created on the `Authorization Server` to illustrate how scoped `access_tokens` work.
 
 ## Chapter 01 - Initial Scenario
 

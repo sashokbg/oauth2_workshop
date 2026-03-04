@@ -79,4 +79,18 @@ async function exchange_code_for_token(code, realm, base_url, client_id, client_
   });
 }
 
+async function getClientToken(base_url, realm, client_id, client_secret) {
+  const tokenUrl = `${base_url}/realms/${realm}/protocol/openid-connect/token`;
+  const body = new URLSearchParams({
+    grant_type: 'client_credentials',
+    client_id: client_id,
+    client_secret: client_secret,
+    scope: 'agenda.read',
+  });
+
+  return await axios.post(tokenUrl, body, {
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+  });
+}
+
 module.exports = {decodeJwtPayload, exchange_code_for_token, tokenRefresher, redirectToAuth}
